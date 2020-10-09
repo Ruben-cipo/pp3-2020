@@ -1,0 +1,15 @@
+.muestra-enter-active {
+    transition: opacity 2s;
+}
+
+.muestra-leave-active {
+    transition: opacity 0.1s;
+}
+
+.muestra-enter, .muestra-leave-to {
+    opacity: 0;
+}
+
+.ancho95 {
+  width: 95%;
+}

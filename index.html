@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumir API</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- <link rel="stylesheet" href="css/materialize.min.css"> -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+    <!-- div principal donde actúa vue -->
+    <div id="cuerpo">
+    <!-- barra de navegación -->
+        <nav class="green darken-3" style="margin-bottom: 1%; padding-left: 2%;" >
+            <div class="nav-wrapper">
+                <a href="#" class="brand-logo">Trabajo Práctico 2 - Carrea Ruben</a>
+            </div>
+        </nav>
+    <!-- fila superior para agregar comentarios, etc -->
+        <div class="row">
+            <div class="col s12">
+                <p></p>
+            </div>
+        </div>
+    <!-- fila principal para trabajar aquí -->
+        <div class="row">
+        <!-- grilla para visualizar las facturas -->
+            <div class="col s8">
+                <div class="card">
+                    <div class="card-content">
+                        <table>
+                        <tr>
+                            <th>Factura</th>
+                            <th>producto</th>
+                            <th>Cliente</th>
+                            <th>IVA</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th>Total</th>
+                            <th>Forma de pago</th>
+                            <th>Acción</th>
+                        </tr>
+                        <tr v-for="(factura,id_factura) of lista_completa">
+                            <td>{{ factura.id_factura }}</td>
+                            <td>{{ factura.nombre_producto }}</td>
+                            <td>{{ factura.nombre_cliente }}</td>
+                            <td>{{ factura.iva }}</td>
+                            <td>{{ factura.cantidad }}</td>
+                            <td>{{ factura.subtotal }}</td>
+                            <td>{{ factura.total }}</td>
+                            <td>{{ factura.forma_pago }}</td>
+                            <td> <!-- botones de edicion para los datos de los usuarios -->
+                                <div class="fixed-action-btn horizontal direction-right" style="position:relative; right: 0px; bottom: 0px" >
+                                    <a class="btn-floating btn-small indigo darken-4">
+                                        <i class="material-icons">menu</i>
+                                    </a>
+                                    <ul style="left: 40px;">
+                                        <li style="margin-left: 0px;">
+                                            <a class="btn-floating btn-small red tooltipped" data-tooltip="Click para eliminar esta factura" v-on:click="eliminarFactura(id_factura)">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </li>
+                                        <li style="margin-left: 0px;">
+                                            <a class="btn-floating btn-small disabled" v-if="agregando">
+                                                <i class="material-icons">person_add</i>
+                                            </a>
+                                            <a class="btn-floating btn-small green tooltipped" data-position="bottom" data-tooltip="Click para agregar una factura" v-else v-on:click="buscar('agregar')">
+                                                <i class="material-icons">person_add</i>
+                                            </a>
+                                        </li>
+                                        <li style="margin-left: 0px;">
+                                            <a class="btn-floating btn-small disabled" v-if="editando">
+                                                <i class="material-icons">edit</i>
+                                            </a>
+                                            <a class="btn-floating btn-small green tooltipped" data-tooltip="Click para editar esta factura" v-else v-on:click="buscar('editar',id_factura)">
+                                                <i class="material-icons">edit</i>
+                                            </a>
+                                        </li>
+                                        <li style="margin-left: 0px;">
+                                            <a class="btn-floating btn-small disabled" v-if="buscando">
+                                                <i class="material-icons">find_replace</i>
+                                            </a>
+                                            <a class="btn-floating btn-small green tooltipped" data-position="bottom" data-tooltip="Click para abrir el cuadro de búsqueda" v-else v-on:click="buscar('buscar')">
+                                                <i class="material-icons">find_replace</i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <!-- espacio para ubicar los cuadros para buscar, agregar, etc -->
+            <div class="col s4">
+                <!-- cuadro de búsqueda -->
+                <transition name="muestra">
+                    <div v-if="buscando" class="card">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <label for="buscar">Ingrese un valor</label>
+                                    <input v-model="busqueda" id="buscar" type="text">
+                                </div>
+                                <div class="input-field col s6">
+                                    <label for="buscar2">y escoja el método de búsqueda</label>
+                                    <input v-model="busqueda2" id="buscar2" type="text">
+                                </div>
+                            </div>
+                            <div class="row">
+                    <!-- con un poco de tiempo, se pueden transformar estos cuatro botones en uno supongo -->
+                                <div class="col s3">
+                                    <button v-on:click="buscarPorId()" class="btn-small blue darken-4 tooltipped ancho95" data-position="bottom" data-tooltip="Escriba un valor en el cuadro de la izquierda">Id Factura</button>
+                                </div>
+                                <div class="col s3">
+                                    <button v-on:click="buscarPorCliente()" class="btn-small blue darken-4 tooltipped ancho95" data-tooltip="Escriba un valor en el cuadro de la izquierda">Nombre</button>
+                                </div>
+                                <div class="col s3">
+                                    <button v-on:click="buscarPorImporte()" class="btn-small blue darken-4 tooltipped ancho95" data-position="bottom" data-tooltip="Escriba el valor menor en el cuadro de la izquierda y el mayor en el de la derecha">Importe</button>
+                                </div>
+                                <div class="col s3">
+                                    <button v-on:click="listarFacturas()" class="btn-small blue tooltipped ancho95" data-tooltip="Click aquí para recargar la grilla">Recargar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </transition>
+                <!-- cuadro de para agregar o editar una factura -->
+                <transition name="muestra">
+                    <div v-if="agregar" class="card">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col s6">
+                                    <label for="inp-producto">Producto</label>
+                                    <input v-model="producto" id="inp-producto" type="text">
+                                </div>
+                                <div class="col s6">
+                                    <label for="inp-cliente">Cliente</label>
+                                    <input v-model="cliente" id="inp-cliente" type="text">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s6">
+                                    <label for="inp-iva">IVA</label>
+                                    <input v-model="iva" id="inp-iva" type="text">
+                                </div>
+                                <div class="col s6">
+                                    <label for="inp-cantidad">Cantidad</label>
+                                    <input v-model="cantidad" id="inp-cantidad" type="text">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s6">
+                                    <label for="inp-subtotal">Subtotal</label>
+                                    <input v-model="subtotal" id="inp-subtotal" type="text">
+                                </div>
+                                <div class="col s6">
+                                    <label>Forma de Pago</label>
+                                    <input v-model="formapago" id="inp-forma" type="text">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s6">
+                                    <label>Total</label>
+                                    <p>{{ calcularTotal }}</p>
+                                    <!-- <input v-model="total" id="inp-total" type="text"> -->
+                                </div>
+<!--                                <div class="input-field col s6">
+                                    <input v-model="idfactura">
+                                </div> -->
+                            </div>  
+                            <div class="row">
+                                <div  v-if="editando" class="col s6">
+                                    <button v-on:click="actualizarFactura()" class="btn-small">Actualizar</button>
+                                </div>
+                                <div v-else class="col s6">
+                                    <button v-on:click="agregarFactura()" class="btn-small blue">Agregar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </transition>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
