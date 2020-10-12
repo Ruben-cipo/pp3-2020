@@ -48,6 +48,7 @@ const instancia1 = new Vue({
             this.editando = false;
             this.agregando = false;
             this.agregar = false;
+            this.buscando = false;
         },
 
         // eliminar una factura
