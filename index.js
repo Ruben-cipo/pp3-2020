@@ -4,9 +4,7 @@ const instancia1 = new Vue({
     data: {
         // esta es la lista de las facturas que se recuperan
         lista_completa:[],
-        // este es el valor del cuadro de búsqueda
-        busqueda:'',
-        busqueda2:'',
+
         // estos son los valores de los importes para buscar
         importemenor: null,
         importemayor: null,
@@ -25,11 +23,19 @@ const instancia1 = new Vue({
         eliminando:false,
         buscando:false,
         agregar:false,
+         // estos son los valores del cuadro de búsqueda
+        busqueda:'',
+        busqueda2:'',
+        // para las casillas de opción
+        busfactura:true,
+        buscliente:false,
+        busproducto:false,
+        busimportes:false,
         // hay que descomentar la ip que se esté usando y comentar las otras
-        //ipactual:'localhost',
-        //ipactual:'172.16.8.7',
+        // ipactual:'localhost',
+        // ipactual:'172.16.8.7',
         ipactual:'192.168.10.104',
-        //ipactual:'192.168.0.189',
+        // ipactual:'192.168.0.189',
     },
 
     methods:{
@@ -119,11 +125,18 @@ const instancia1 = new Vue({
             this.busqueda = '';
         },
 
+        buscarPorProducto(){
+            producto = this.busqueda;
+            axios.get('http://' + this.ipactual + ':3000/obtfacturapro/' + producto).then(resultado => {
+                this.lista_completa = resultado.data;
+            });
+            this.busqueda = '';
+        },
+
         // buscar una factura por importe entre dos valores
         buscarPorImporte(){
             menor = this.busqueda;
             mayor = this.busqueda2;
-            alert(menor + mayor);
             axios.get('http://' + this.ipactual + ':3000/obtfacturaimp/' + menor + '/' + mayor).then(resultado => {
                 this.lista_completa = resultado.data;
             });
@@ -141,7 +154,7 @@ const instancia1 = new Vue({
             this.formapago = '';
         },
 
-        buscar(seleccion,indice){
+        seleccionar(seleccion,indice){
             // esto habilita o deshabilita los cuadros
             
             this.buscando = false;
@@ -171,6 +184,35 @@ const instancia1 = new Vue({
             
             }
         },
+
+        seleccionarCheckbox(valor){
+            
+            this.buscliente = false;
+            this.busfactura = false;
+            this.busimportes = false;
+            this.busproducto = false;
+
+            switch (valor) {
+                case 'fact':
+                    this.busfactura = true;
+                    this.buscarPorId();
+                    break;
+                case 'clie':
+                    this.buscliente = true;
+                    this.buscarPorCliente();
+                    break;
+                case 'prod':
+                    this.busproducto = true;
+                    this.buscarPorProducto();
+                    break;
+                case 'impo':
+                    this.busimportes = true;
+                    this.buscarPorImporte();
+                    break;
+                default:
+            }
+        },
+
     },
 
     computed: {

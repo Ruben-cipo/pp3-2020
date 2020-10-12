@@ -66,7 +66,7 @@
                                             <a class="btn-floating btn-small disabled" v-if="agregando">
                                                 <i class="material-icons">person_add</i>
                                             </a>
-                                            <a class="btn-floating btn-small green tooltipped" data-position="bottom" data-tooltip="Click para agregar una factura" v-else v-on:click="buscar('agregar')">
+                                            <a class="btn-floating btn-small green tooltipped" data-position="bottom" data-tooltip="Click para agregar una factura" v-else v-on:click="seleccionar('agregar')">
                                                 <i class="material-icons">person_add</i>
                                             </a>
                                         </li>
@@ -74,7 +74,7 @@
                                             <a class="btn-floating btn-small disabled" v-if="editando">
                                                 <i class="material-icons">edit</i>
                                             </a>
-                                            <a class="btn-floating btn-small green tooltipped" data-tooltip="Click para editar esta factura" v-else v-on:click="buscar('editar',id_factura)">
+                                            <a class="btn-floating btn-small green tooltipped" data-tooltip="Click para editar esta factura" v-else v-on:click="seleccionar('editar',id_factura)">
                                                 <i class="material-icons">edit</i>
                                             </a>
                                         </li>
@@ -82,7 +82,7 @@
                                             <a class="btn-floating btn-small disabled" v-if="buscando">
                                                 <i class="material-icons">find_replace</i>
                                             </a>
-                                            <a class="btn-floating btn-small green tooltipped" data-position="bottom" data-tooltip="Click para abrir el cuadro de búsqueda" v-else v-on:click="buscar('buscar')">
+                                            <a class="btn-floating btn-small green tooltipped" data-position="bottom" data-tooltip="Click para abrir el cuadro de búsqueda" v-else v-on:click="seleccionar('buscar')">
                                                 <i class="material-icons">find_replace</i>
                                             </a>
                                         </li>
@@ -111,20 +111,42 @@
                                 </div>
                             </div>
                             <div class="row">
-                    <!-- con un poco de tiempo, se pueden transformar estos cuatro botones en uno supongo -->
-                                <div class="col s3">
-                                    <button v-on:click="buscarPorId()" class="btn-small blue darken-4 tooltipped ancho95" data-position="bottom" data-tooltip="Escriba un valor en el cuadro de la izquierda">Id Factura</button>
-                                </div>
-                                <div class="col s3">
-                                    <button v-on:click="buscarPorCliente()" class="btn-small blue darken-4 tooltipped ancho95" data-tooltip="Escriba un valor en el cuadro de la izquierda">Nombre</button>
-                                </div>
-                                <div class="col s3">
-                                    <button v-on:click="buscarPorImporte()" class="btn-small blue darken-4 tooltipped ancho95" data-position="bottom" data-tooltip="Escriba el valor menor en el cuadro de la izquierda y el mayor en el de la derecha">Importe</button>
-                                </div>
-                                <div class="col s3">
-                                    <button v-on:click="listarFacturas()" class="btn-small blue tooltipped ancho95" data-tooltip="Click aquí para recargar la grilla">Recargar</button>
+                                <div class="col s12">
+                                    <label>
+                                        <input v-on:click="seleccionarCheckbox('fact')" name="grupobotones" type="radio"/>
+                                        <span>Número de Factura</span>
+                                    </label>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <label>
+                                        <input v-on:click="seleccionarCheckbox('clie')" name="grupobotones" type="radio"/>
+                                        <span>Nombre de Cliente</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <label>
+                                        <input v-on:click="seleccionarCheckbox('prod')" name="grupobotones" type="radio"/>
+                                        <span>Nombre de Producto</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12">
+                                    <label>
+                                        <input v-on:click="seleccionarCheckbox('impo')" name="grupobotones" type="radio"/>
+                                        <span>Valor entre dos Importes</span>
+                                    </label>
+                                </div>
+                            </div>
+<!--                             <div class="row">
+                                <div class="col s12">
+                                    <button v-on:click="buscarAlgo()" class="btn-small blue darken-4 tooltipped" data-position="bottom" data-tooltip="seleccione el método y haga click aquí">Buscar</button>
+                                </div>
+                            </div> -->
                         </div>
                     </div>
                 </transition>
@@ -165,12 +187,9 @@
                             <div class="row">
                                 <div class="col s6">
                                     <label>Total</label>
-                                    <p>{{ calcularTotal }}</p>
-                                    <!-- <input v-model="total" id="inp-total" type="text"> -->
+                                    <p style="display: none;">{{ calcularTotal }}</p>
+                                    <input v-model="total" id="inp-total" type="text">
                                 </div>
-<!--                                <div class="input-field col s6">
-                                    <input v-model="idfactura">
-                                </div> -->
                             </div>  
                             <div class="row">
                                 <div  v-if="editando" class="col s6">
