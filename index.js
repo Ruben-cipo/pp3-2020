@@ -243,3 +243,8 @@ document.addEventListener('click', function() {
     var elems = document.querySelectorAll('.tooltipped');
     var instances = M.Tooltip.init(elems, {position: 'top'});
 });
+
+const escucha = io('http://' + ipactual + ':3000');
+escucha.on('datos', (valor) => {
+    $("#receptor").html(valor);
+});
