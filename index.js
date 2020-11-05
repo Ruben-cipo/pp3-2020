@@ -216,6 +216,11 @@ const instancia1 = new Vue({
 
     },
 
+    async mounted() {
+        
+    },
+
+
     computed: {
 
         calcularTotal: function(){
